@@ -88,7 +88,7 @@ exprs = sepBy expr (lexeme (char ','))
 term :: Parser Expr
 term = try pipeApp
    <|> try app
-   <|> try factor
+   <|> factor
 
 pipeApp :: Parser Expr
 pipeApp = foldl1 (flip App) <$> ((:) <$> factor <*> many1 (lexeme (string "|>") *> factor))
