@@ -14,6 +14,7 @@ test code asAst (es, esAst) =
     showAsAst asAst
       | length asAst == 1 = show $ head asAst
       | otherwise         = show asAst
+
 spec :: Spec
 spec = do
   describe "application" $ do
