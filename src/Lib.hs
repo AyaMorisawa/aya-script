@@ -98,8 +98,8 @@ factor :: Parser Expr
 factor = Natural <$> natural
      <|> Var <$> identifier
      <|> try (parens expr)
-     <|> try tuple
-     <|> try list
+     <|> tuple
+     <|> list
 
 tuple :: Parser Expr
 tuple = Tuple <$> parens exprs
