@@ -1,6 +1,8 @@
 # AyaScript
 [![][travis-badge]][travis-link]
 
+AyaScript is a language which compiles to JavaScript.
+
 ## How to build
 `git clone git://github.com/AyaMorisawa/aya-script.git`
 `cd aya-script`
