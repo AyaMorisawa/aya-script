@@ -4,12 +4,22 @@
 AyaScript is a language which compiles to JavaScript.
 
 ## How to build
-`git clone git://github.com/AyaMorisawa/aya-script.git`
-`cd aya-script`
-`stack build`
+```
+git clone git://github.com/AyaMorisawa/aya-script.git
+```
+
+```
+cd aya-script
+```
+
+```
+stack build
+```
 
 ## How to test
-`stack test`
+```
+stack test
+```
 
 ## License
 The MIT License. See [LICENSE](LICENSE).
