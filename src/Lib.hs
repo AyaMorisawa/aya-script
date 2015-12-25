@@ -29,6 +29,7 @@ identifier  = P.identifier lexer
 lexeme      = P.lexeme lexer
 
 data Stmt = Expr Expr
+  deriving (Show, Eq)
 
 data Expr = Natural Integer
           | UnaryOp String Expr
@@ -39,7 +40,7 @@ data Expr = Natural Integer
           | If Expr Expr Expr
           | Tuple [Expr]
           | List [Expr]
-  deriving (Show)
+  deriving (Show, Eq)
 
 type Program = [Stmt]
 
