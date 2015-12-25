@@ -12,5 +12,5 @@
 ## License
 The MIT License. See [LICENSE](LICENSE).
 
-[travis-link]:     https://travis-ci.org/MissKernel/Misskey-API
-[travis-badge]:    http://img.shields.io/travis/MissKernel/Misskey-API.svg?style=flat-square
+[travis-link]:     https://travis-ci.org/AyaMorisawa/aya-script
+[travis-badge]:    http://img.shields.io/travis/AyaMorisawa/aya-script.svg?style=flat-square
