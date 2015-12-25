@@ -41,6 +41,16 @@ spec = do
     test "f (a, b)" [Expr (App (Var "f") (Tuple [Var "a",Var "b"]))] (
         "f(a, b)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
       )
+  describe "list" $ do
+    test "[]" [Expr (List [])] (
+        "[]", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrayExpression\",\"elements\":[]}}],\"sourceType\":\"script\"}"
+      )
+    test "[a]" [Expr (List [Var "a"])] (
+        "[a]", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrayExpression\",\"elements\":[{\"type\":\"Identifier\",\"name\":\"a\"}]}}],\"sourceType\":\"script\"}"
+      )
+    test "[a, b]" [Expr (List [Var "a",Var "b"])] (
+        "[a, b]", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrayExpression\",\"elements\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
+      )
   describe "member" $ do
     test "a.b" [Expr (BinOp "." (Var "a") (Var "b"))] (
         "a.b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"a\"},\"property\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
