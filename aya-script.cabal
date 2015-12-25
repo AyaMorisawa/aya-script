@@ -9,7 +9,6 @@ maintainer:          AyaMorisawa4869@gmial.com
 copyright:           (c) 2015 Aya Morisawa
 category:            Compiler
 build-type:          Simple
--- extra-source-files:
 cabal-version:       >=1.10
 
 library
