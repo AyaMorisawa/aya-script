@@ -51,6 +51,10 @@ spec = do
     test "a.3 + 2" [Expr (BinOp "+" (BinOp "." (Var "a") (Natural 3)) (Natural 2))] (
         "a[3] + 2", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"MemberExpression\",\"computed\":true,\"object\":{\"type\":\"Identifier\",\"name\":\"a\"},\"property\":{\"type\":\"Literal\",\"value\":3,\"raw\":\"3\"}},\"right\":{\"type\":\"Literal\",\"value\":2,\"raw\":\"2\"}}}],\"sourceType\":\"script\"}"
       )
+  describe "function" $ do
+    test "\\x -> x" [Expr (Fun "x" (Var "x"))] (
+        "x => x", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrowFunctionExpression\",\"id\":null,\"params\":[{\"type\":\"Identifier\",\"name\":\"x\"}],\"defaults\":[],\"body\":{\"type\":\"Identifier\",\"name\":\"x\"},\"generator\":false,\"expression\":true}}],\"sourceType\":\"script\"}"
+      )
   describe "if-then-else" $ do
     test "if a then b else c" [Expr (If (Var "a") (Var "b") (Var "c"))] (
         "a ? b : c", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ConditionalExpression\",\"test\":{\"type\":\"Identifier\",\"name\":\"a\"},\"consequent\":{\"type\":\"Identifier\",\"name\":\"b\"},\"alternate\":{\"type\":\"Identifier\",\"name\":\"c\"}}}],\"sourceType\":\"script\"}"
