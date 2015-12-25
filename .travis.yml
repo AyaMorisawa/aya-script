@@ -12,6 +12,7 @@ before_install:
 
 install:
   - stack setup
+  - stack build --no-terminal
 
 script:
   - stack test
