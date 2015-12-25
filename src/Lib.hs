@@ -1,4 +1,4 @@
-module Lib (compile, ayaScriptParser) where
+module Lib where
 
 import Data.List
 import Text.ParserCombinators.Parsec
