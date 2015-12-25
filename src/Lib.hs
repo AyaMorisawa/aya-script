@@ -18,8 +18,7 @@ lexer = P.makeTokenParser (haskellDef { reservedOpNames = [
   "&&", "||",
   ">", "<", ">=", "<=",
   "==", "/=",
-  "<$>",
-  "|>"
+  "<$>"
 ]})
 
 natural     = P.natural lexer
@@ -73,8 +72,7 @@ expr = buildExpressionParser table term
              [binop "&&" AssocLeft, binop "||" AssocLeft],
              [binop ">" AssocLeft, binop "<" AssocLeft, binop ">=" AssocLeft, binop "<=" AssocLeft],
              [binop "==" AssocLeft, binop "/=" AssocLeft],
-             [binop "<$>" AssocLeft],
-             [binop "|>" AssocLeft]]
+             [binop "<$>" AssocLeft]]
     binop op assoc = Infix (do
         reservedOp op
         return $ BinOp op
@@ -88,8 +86,12 @@ exprs :: Parser [Expr]
 exprs = sepBy expr (lexeme (char ','))
 
 term :: Parser Expr
-term = try app
+term = try pipeApp
+   <|> try app
    <|> try factor
+
+pipeApp :: Parser Expr
+pipeApp = foldl1 (flip App) <$> ((:) <$> factor <*> many1 (lexeme (string "|>") *> factor))
 
 app :: Parser Expr
 app = foldl1 App <$> many2 factor
@@ -158,8 +160,6 @@ genESExpr (BinOp "==" e1 e2) = genESExpr (BinOp "===" e1 e2)
 genESExpr (BinOp "/=" e1 e2) = genESExpr (BinOp "!==" e1 e2)
 
 genESExpr (BinOp "<$>" e1 e2) = genESExpr (App (BinOp "." e2 (Var "map")) e1)
-
-genESExpr (BinOp "|>" e1 e2) = genESExpr (App e2 e1)
 
 genESExpr (BinOp op e1 e2) =
   "{\"type\":\"BinaryExpression\"," ++

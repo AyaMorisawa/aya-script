@@ -25,10 +25,10 @@ spec = do
         "f(a)(b)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"}]},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
       )
   describe "piping-application" $ do
-    test "x |> f" [Expr (BinOp "|>" (Var "x") (Var "f"))] (
+    test "x |> f" [Expr (App (Var "f") (Var "x"))] (
         "f(x)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}}],\"sourceType\":\"script\"}"
       )
-    test "x |> f |> g" [Expr (BinOp "|>" (BinOp "|>" (Var "x") (Var "f")) (Var "g"))] (
+    test "x |> f |> g" [Expr (App (Var "g") (App (Var "f") (Var "x")))] (
         "g(f(x))", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"g\"},\"arguments\":[{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}]}}],\"sourceType\":\"script\"}"
       )
   describe "tuple" $ do
