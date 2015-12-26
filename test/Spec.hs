@@ -30,6 +30,12 @@ spec = do
     test "a / b" [Expr (BinOp "/" (Var "a") (Var "b"))] (
         "a / b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"/\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
       )
+    test "a + (b * c)" [Expr (BinOp "+" (Var "a") (BinOp "*" (Var "b") (Var "c")))] (
+        "a + b * c", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"BinaryExpression\",\"operator\":\"*\",\"left\":{\"type\":\"Identifier\",\"name\":\"b\"},\"right\":{\"type\":\"Identifier\",\"name\":\"c\"}}}}],\"sourceType\":\"script\"}"
+      )
+    test "a * (b + c)" [Expr (BinOp "*" (Var "a") (BinOp "+" (Var "b") (Var "c")))] (
+        "a * (b + c)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"*\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"b\"},\"right\":{\"type\":\"Identifier\",\"name\":\"c\"}}}}],\"sourceType\":\"script\"}"
+      )
   describe "application" $ do
     test "f x" [Expr (App (Var "f") (Var "x"))] (
         "f(x)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}}],\"sourceType\":\"script\"}"
