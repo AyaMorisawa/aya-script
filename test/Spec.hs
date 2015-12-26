@@ -36,6 +36,10 @@ spec = do
     test "a * (b + c)" [Expr (BinOp "*" (Var "a") (BinOp "+" (Var "b") (Var "c")))] (
         "a * (b + c)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"*\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"b\"},\"right\":{\"type\":\"Identifier\",\"name\":\"c\"}}}}],\"sourceType\":\"script\"}"
       )
+  describe "mapping-operator" $ do
+    test "f <$> x" [Expr (BinOp "<$>" (Var "f") (Var "x"))] (
+        "x.map(f)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"x\"},\"property\":{\"type\":\"Identifier\",\"name\":\"map\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"f\"}]}}],\"sourceType\":\"script\"}"
+      )
   describe "application" $ do
     test "f x" [Expr (App (Var "f") (Var "x"))] (
         "f(x)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}}],\"sourceType\":\"script\"}"
