@@ -27,6 +27,7 @@ identifier  = P.identifier lexer
 lexeme      = P.lexeme lexer
 
 data Stmt = Expr Expr
+          | Decl Expr Expr
   deriving (Show, Eq)
 
 data Expr = Natural Integer
@@ -55,7 +56,8 @@ stmts :: Parser [Stmt]
 stmts = sepBy stmt (char '\n')
 
 stmt :: Parser Stmt
-stmt = Expr <$> expr
+stmt = try (Decl <$> expr <*> (lexeme (char '=') *> expr))
+   <|> Expr <$> expr
 
 expr :: Parser Expr
 expr = buildExpressionParser table term
@@ -132,6 +134,16 @@ genESStmt :: Stmt -> String
 genESStmt (Expr e) =
   "{\"type\":\"ExpressionStatement\"," ++
    "\"expression\":" ++ genESExpr e ++ "}"
+
+genESStmt (Decl e1 e2) =
+  "{\"type\":\"VariableDeclaration\"," ++
+   "\"declarations\":[{" ++
+       "\"type\":\"VariableDeclarator\"," ++
+       "\"id\":" ++ genESExpr e1 ++ "," ++
+       "\"init\":" ++ genESExpr e2 ++ "}" ++
+     "]," ++
+   "\"kind\":\"var\"}"
+
 
 genESExpr :: Expr -> String
 genESExpr (Natural x) =
