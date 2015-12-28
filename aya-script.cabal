@@ -14,6 +14,10 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     AyaScript
+                     , AyaScript.GenES
+                     , AyaScript.Program
+                     , AyaScript.Stmt
+                     , AyaScript.Expr
   build-depends:       base >= 4.7 && < 5
                      , parsec
   default-language:    Haskell2010
