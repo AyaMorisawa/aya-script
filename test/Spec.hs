@@ -8,7 +8,7 @@ main = hspec spec
 test :: String -> Program -> (String, String) -> SpecWith ()
 test code asAst (es, esAst) =
   context code $ do
-    it ("parses to " ++ showAsAst asAst) $ ayaScriptParser code `shouldBe` Right asAst
+    it ("parses to " ++ showAsAst asAst) $ parse code `shouldBe` Right asAst
     it ("compiles to " ++ es) $
       compile code `shouldBe` Right esAst
   where
