@@ -144,7 +144,6 @@ genESStmt (Decl e1 e2) =
      "]," ++
    "\"kind\":\"var\"}"
 
-
 genESExpr :: Expr -> String
 genESExpr (Natural x) =
   "{\"type\":\"Literal\"," ++
