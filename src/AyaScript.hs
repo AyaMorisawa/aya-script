@@ -9,23 +9,11 @@ import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as P
 
-many2 :: Parser a -> Parser [a]
-many2 x = (:) <$> x <*> many1 x
-
 lexer :: P.TokenParser ()
-lexer = P.makeTokenParser (haskellDef { reservedOpNames = [
-  ".",
-  "**",
-  "*", "/",
-  "+", "-",
-  "&&", "||",
-  ">", "<", ">=", "<=",
-  "==", "/="
-]})
+lexer = P.makeTokenParser (haskellDef{ reservedOpNames = [] })
 
 natural     = P.natural lexer
 parens      = P.parens lexer
-reservedOp  = P.reservedOp lexer
 identifier  = P.identifier lexer
 lexeme      = P.lexeme lexer
 
@@ -47,67 +35,74 @@ stmt = try (Decl <$> expr <*> (lexeme (char '=') *> expr))
    <|> Expr <$> expr
 
 expr :: Parser Expr
-expr = buildExpressionParser table term
-   <|> fun
-   <|> ifExpr
-   <?> "expression"
-  where
-    table = [[binop "." AssocLeft],
-             [unary "-"],
-             [binop "**" AssocRight],
-             [binop "*" AssocLeft, binop "/" AssocLeft],
-             [binop "+" AssocLeft, binop "-" AssocLeft],
-             [binop "&&" AssocLeft, binop "||" AssocLeft],
-             [binop ">" AssocLeft, binop "<" AssocLeft, binop ">=" AssocLeft, binop "<=" AssocLeft],
-             [binop "==" AssocLeft, binop "/=" AssocLeft]]
-    binop op assoc = Infix (do
-        reservedOp op
-        return $ BinOp op
-      <?> "operator") assoc
-    unary op = Prefix (do
-        reservedOp op
-        return $ UnaryOp op
-      )
+expr = pipeOp
 
 exprs :: Parser [Expr]
 exprs = sepBy expr (lexeme (char ','))
 
-term :: Parser Expr
-term = try mapOp
-   <|> try pipeApp
-   <|> try app
-   <|> factor
+pipeOp, mapOp, addOp, mulOp, expOp, logicOp, eqOp, compareOp, appOp, memberOp :: Parser Expr
+pipeOp    = binOp AssocLeft  ["|>"] mapOp
+mapOp     = binOp AssocLeft  ["<$>"] addOp
+addOp     = binOp AssocLeft  ["+", "-"] mulOp
+mulOp     = binOp AssocLeft  ["*", "/"] expOp
+expOp     = binOp AssocRight ["**"] logicOp
+logicOp   = binOp AssocLeft  ["&&", "||"] eqOp
+eqOp      = binOp AssocLeft  ["==", "/="] compareOp
+compareOp = binOp AssocLeft  ["<=", ">=", "<", ">"] appOp
+appOp     = binOp AssocLeft  [""] memberOp
+memberOp  = binOp AssocLeft  ["."] value
 
-mapOp :: Parser Expr
-mapOp = foldl1 mapApp <$> ((:) <$> factor <*> many1 (lexeme (string "<$>") *> factor))
-  where
-    mapApp f xs = App (BinOp "." xs (Var "map")) f
+value :: Parser Expr
+value = try ifE
+    <|> try negateOp
+    <|> funE
+    <|> listE
+    <|> try (parens expr)
+    <|> tupleE
+    <|> var
+    <|> numL
+    <|> strL
 
-pipeApp :: Parser Expr
-pipeApp = foldl1 (flip App) <$> ((:) <$> factor <*> many1 (lexeme (string "|>") *> factor))
+negateOp :: Parser Expr
+negateOp  = unaryOp ["-"] memberOp
 
-app :: Parser Expr
-app = foldl1 App <$> many2 factor
+ifE :: Parser Expr
+ifE = If <$> (lexeme (string "if") *> expr)
+         <*> (lexeme (string "then") *> expr)
+         <*> (lexeme (string "else") *> expr)
 
-factor :: Parser Expr
-factor = Natural <$> natural
-     <|> try (Str <$> (lexeme (char '"') *> many (noneOf "\"") <* lexeme (char '"')))
-     <|> Var <$> identifier
-     <|> try (parens expr)
-     <|> tuple
-     <|> list
-
-tuple :: Parser Expr
-tuple = Tuple <$> parens exprs
-
-list :: Parser Expr
-list = List <$> (lexeme (char '[') *> exprs <* lexeme (char ']'))
-
-fun :: Parser Expr
-fun = Fun <$> (lexeme (char '\\') *> identifier)
+funE :: Parser Expr
+funE = Fun <$> (lexeme (char '\\') *> identifier)
           <*> (lexeme (string "->") *> expr)
 
-ifExpr :: Parser Expr
-ifExpr = If <$> (lexeme (string "if") *> expr)
-            <*> (lexeme (string "then") *> expr)
-            <*> (lexeme (string "else") *> expr)
+listE :: Parser Expr
+listE = List <$> (lexeme (char '[') *> exprs <* lexeme (char ']'))
+
+tupleE :: Parser Expr
+tupleE = Tuple <$> parens exprs
+
+var :: Parser Expr
+var = Var <$> identifier
+
+numL :: Parser Expr
+numL = Natural <$> natural
+
+strL :: Parser Expr
+strL = Str <$> (lexeme (char '"') *> many (noneOf "\"") <* lexeme (char '"'))
+
+binOp :: Assoc -> [String] -> Parser Expr -> Parser Expr
+binOp assoc ops prev = do
+  e1 <- prev
+  es <- many $ try $ do
+    op <- lexeme $ foldl1 (<|>) (try . string <$> ops)
+    e2 <- prev
+    return $ (op, e2)
+  return $ case assoc of
+    AssocLeft -> foldl (\acc (op, e2) -> BinOp op acc e2) e1 es
+    AssocRight -> foldr (\(op, e2) acc -> BinOp op acc e2) e1 es
+
+unaryOp :: [String] -> Parser Expr -> Parser Expr
+unaryOp ops prev = do
+  op <- foldl1 (<|>) (try . string <$> ops)
+  e <- try prev
+  return $ UnaryOp op e

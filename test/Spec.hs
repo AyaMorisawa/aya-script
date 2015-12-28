@@ -34,28 +34,59 @@ spec = do
       test "a / b" [Expr (BinOp "/" (Var "a") (Var "b"))] (
           "a / b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"/\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
         )
+      test "a ** b" [Expr (BinOp "**" (Var "a") (Var "b"))] (
+          "Math.pow(a, b)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"Math\"},\"property\":{\"type\":\"Identifier\",\"name\":\"pow\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
+        )
+      test "a && b" [Expr (BinOp "&&" (Var "a") (Var "b"))] (
+          "a && b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"&&\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
+      test "a || b" [Expr (BinOp "||" (Var "a") (Var "b"))] (
+          "a || b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"||\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
+      test "a == b" [Expr (BinOp "==" (Var "a") (Var "b"))] (
+          "a === b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"===\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
+      test "a /= b" [Expr (BinOp "/=" (Var "a") (Var "b"))] (
+          "a !== b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"!==\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
+      test "a < b" [Expr (BinOp "<" (Var "a") (Var "b"))] (
+          "a < b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"<\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
+      test "a > b" [Expr (BinOp ">" (Var "a") (Var "b"))] (
+          "a > b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\">\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
+      test "a <= b" [Expr (BinOp "<=" (Var "a") (Var "b"))] (
+          "a <= b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"<=\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
+      test "a >= b" [Expr (BinOp ">=" (Var "a") (Var "b"))] (
+          "a >= b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\">=\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
+        )
       test "a + (b * c)" [Expr (BinOp "+" (Var "a") (BinOp "*" (Var "b") (Var "c")))] (
           "a + b * c", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"BinaryExpression\",\"operator\":\"*\",\"left\":{\"type\":\"Identifier\",\"name\":\"b\"},\"right\":{\"type\":\"Identifier\",\"name\":\"c\"}}}}],\"sourceType\":\"script\"}"
         )
       test "a * (b + c)" [Expr (BinOp "*" (Var "a") (BinOp "+" (Var "b") (Var "c")))] (
           "a * (b + c)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"*\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"b\"},\"right\":{\"type\":\"Identifier\",\"name\":\"c\"}}}}],\"sourceType\":\"script\"}"
         )
+    describe "negate-operator" $ do
+      test "-a" [Expr (UnaryOp "-" (Var "a"))] (
+          "-a", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"UnaryExpression\",\"operator\":\"-\",\"argument\":{\"type\":\"Identifier\",\"name\":\"a\"},\"prefix\":true}}],\"sourceType\":\"script\"}"
+        )
     describe "mapping-operator" $ do
-      test "f <$> x" [Expr (App (BinOp "." (Var "x") (Var "map")) (Var "f"))] (
-          "x.map(f)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"x\"},\"property\":{\"type\":\"Identifier\",\"name\":\"map\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"f\"}]}}],\"sourceType\":\"script\"}"
+      test "f <$> xs" [Expr (BinOp "<$>" (Var "f") (Var "xs"))] (
+          "xs.map(f)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"xs\"},\"property\":{\"type\":\"Identifier\",\"name\":\"map\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"f\"}]}}],\"sourceType\":\"script\"}"
         )
     describe "application" $ do
-      test "f x" [Expr (App (Var "f") (Var "x"))] (
+      test "f x" [Expr (BinOp "" (Var "f") (Var "x"))] (
           "f(x)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}}],\"sourceType\":\"script\"}"
         )
-      test "f a b" [Expr (App (App (Var "f") (Var "a")) (Var "b"))] (
+      test "f a b" [Expr (BinOp "" (BinOp "" (Var "f") (Var "a")) (Var "b"))] (
           "f(a)(b)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"}]},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
         )
     describe "piping-operator" $ do
-      test "x |> f" [Expr (App (Var "f") (Var "x"))] (
+      test "x |> f" [Expr (BinOp "|>" (Var "x") (Var "f"))] (
           "f(x)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}}],\"sourceType\":\"script\"}"
         )
-      test "x |> f |> g" [Expr (App (Var "g") (App (Var "f") (Var "x")))] (
+      test "x |> f |> g" [Expr (BinOp "|>" (BinOp "|>" (Var "x") (Var "f")) (Var "g"))] (
           "g(f(x))", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"g\"},\"arguments\":[{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"x\"}]}]}}],\"sourceType\":\"script\"}"
         )
     describe "tuple" $ do
@@ -65,10 +96,10 @@ spec = do
       test "(a, b)" [Expr (Tuple [Var "a",Var "b"])] (
           "[a, b]", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrayExpression\",\"elements\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
         )
-      test "f (a, b)" [Expr (App (Var "f") (Tuple [Var "a",Var "b"]))] (
+      test "f (a, b)" [Expr (BinOp "" (Var "f") (Tuple [Var "a",Var "b"]))] (
           "f(a, b)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
         )
-      test "(a, b) |> f" [Expr (App (Var "f") (Tuple [Var "a",Var "b"]))] (
+      test "(a, b) |> f" [Expr (BinOp "|>" (Tuple [Var "a",Var "b"]) (Var "f"))] (
           "f(a, b)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"Identifier\",\"name\":\"f\"},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
         )
     describe "list" $ do

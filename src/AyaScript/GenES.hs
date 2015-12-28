@@ -62,11 +62,25 @@ genESExpr (BinOp "." e1 e2) =
    "\"object\":" ++ genESExpr e1 ++ "," ++
    "\"property\":" ++ genESExpr e2 ++ "}"
 
-genESExpr (BinOp "**" e1 e2) = genESExpr (App (BinOp "." (Var "Math") (Var "pow")) (Tuple [e1, e2]))
+genESExpr (BinOp "**" e1 e2) = genESExpr (BinOp "" (BinOp "." (Var "Math") (Var "pow")) (Tuple [e1, e2]))
+
+genESExpr (BinOp "|>" x f) = genESExpr (BinOp "" f x)
+
+genESExpr (BinOp "<$>" f xs) = genESExpr (BinOp "" (BinOp "." xs (Var "map")) f)
 
 genESExpr (BinOp "==" e1 e2) = genESExpr (BinOp "===" e1 e2)
 
 genESExpr (BinOp "/=" e1 e2) = genESExpr (BinOp "!==" e1 e2)
+
+genESExpr (BinOp "" e1 (Tuple es)) =
+  "{\"type\":\"CallExpression\"," ++
+   "\"callee\":" ++ genESExpr e1 ++ "," ++
+   "\"arguments\":[" ++ (intercalate "," $ genESExpr <$> es) ++ "]}"
+
+genESExpr (BinOp "" e1 e2) =
+  "{\"type\":\"CallExpression\"," ++
+   "\"callee\":" ++ genESExpr e1 ++ "," ++
+   "\"arguments\":[" ++ genESExpr e2 ++ "]}"
 
 genESExpr (BinOp op e1 e2) =
   "{\"type\":\"BinaryExpression\"," ++
@@ -86,16 +100,6 @@ genESExpr (Fun param e) =
    "\"body\":" ++ genESExpr e ++ "," ++
    "\"generator\":false," ++
    "\"expression\":true}"
-
-genESExpr (App e1 (Tuple es)) =
-  "{\"type\":\"CallExpression\"," ++
-   "\"callee\":" ++ genESExpr e1 ++ "," ++
-   "\"arguments\":[" ++ (intercalate "," $ genESExpr <$> es) ++ "]}"
-
-genESExpr (App e1 e2) =
-  "{\"type\":\"CallExpression\"," ++
-   "\"callee\":" ++ genESExpr e1 ++ "," ++
-   "\"arguments\":[" ++ genESExpr e2 ++ "]}"
 
 genESExpr (If e1 e2 e3) =
   "{\"type\":\"ConditionalExpression\"," ++
