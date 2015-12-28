@@ -81,6 +81,10 @@ spec = do
       test "[a, b]" [Expr (List [Var "a",Var "b"])] (
           "[a, b]", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrayExpression\",\"elements\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
         )
+    describe "string" $ do
+      test "\"abc\"" [Expr (Str "abc")] (
+          "'abc'", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"Literal\",\"value\":\"abc\",\"raw\":\"'abc'\"}}],\"sourceType\":\"script\"}"
+        )
     describe "member" $ do
       test "a.b" [Expr (BinOp "." (Var "a") (Var "b"))] (
           "a.b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"a\"},\"property\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"

@@ -91,6 +91,7 @@ app = foldl1 App <$> many2 factor
 
 factor :: Parser Expr
 factor = Natural <$> natural
+     <|> Str <$> (char '"' *> many (noneOf "\"") <* char '"')
      <|> Var <$> identifier
      <|> try (parens expr)
      <|> tuple

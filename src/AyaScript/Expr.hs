@@ -1,6 +1,7 @@
 module AyaScript.Expr where
 
 data Expr = Natural Integer
+          | Str String
           | UnaryOp String Expr
           | BinOp String Expr Expr
           | Var String

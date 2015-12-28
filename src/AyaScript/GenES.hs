@@ -39,6 +39,11 @@ genESExpr (Natural x) =
    "\"value\":" ++ show x ++ "," ++
    "\"raw\":\"" ++ show x ++ "\"}"
 
+genESExpr (Str x) =
+ "{\"type\":\"Literal\"," ++
+  "\"value\":\"" ++ x ++ "\"," ++
+  "\"raw\":\"'" ++ x ++ "'\"}"
+
 genESExpr (UnaryOp op e) =
   "{\"type\":\"UnaryExpression\"," ++
    "\"operator\":\"" ++ op ++ "\"," ++
