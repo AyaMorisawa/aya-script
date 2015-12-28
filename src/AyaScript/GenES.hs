@@ -19,13 +19,10 @@ me = id
 le :: [Expr] -> [Expr]
 le = id
 
-o :: ToJSON a => a -> String
-o = unpack . encode
-
 genES :: Program -> String
-genES stmts = o $ object [ "type" .= s "Program"
-                         , "body" .= stmts
-                         , "sourceType" .= s "script"]
+genES stmts = unpack $ encode $ object [ "type" .= s "Program"
+                                       , "body" .= stmts
+                                       , "sourceType" .= s "script"]
 
 instance ToJSON Expr where
   toJSON (Natural x) = object [ "type" .= s "Literal"
