@@ -37,7 +37,7 @@ spec = do
         "a * (b + c)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"*\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"BinaryExpression\",\"operator\":\"+\",\"left\":{\"type\":\"Identifier\",\"name\":\"b\"},\"right\":{\"type\":\"Identifier\",\"name\":\"c\"}}}}],\"sourceType\":\"script\"}"
       )
   describe "mapping-operator" $ do
-    test "f <$> x" [Expr (BinOp "<$>" (Var "f") (Var "x"))] (
+    test "f <$> x" [Expr (App (BinOp "." (Var "x") (Var "map")) (Var "f"))] (
         "x.map(f)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"x\"},\"property\":{\"type\":\"Identifier\",\"name\":\"map\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"f\"}]}}],\"sourceType\":\"script\"}"
       )
   describe "application" $ do
