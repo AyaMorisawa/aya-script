@@ -7,8 +7,9 @@ main :: IO ()
 main = do
   args <- getArgs
   if length args /= 1
-    then
-      putStrLn "Usage: asc [CODE]"
+    then do
+      code <- getContents
+      putStrLn $ either show id $ compile code
     else do
       let code = head args
       putStrLn $ either show id $ compile code
