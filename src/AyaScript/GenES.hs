@@ -38,9 +38,9 @@ genESExpr (Natural x) =
    "\"raw\":\"" ++ show x ++ "\"}"
 
 genESExpr (Str x) =
- "{\"type\":\"Literal\"," ++
-  "\"value\":\"" ++ x ++ "\"," ++
-  "\"raw\":\"'" ++ x ++ "'\"}"
+  "{\"type\":\"Literal\"," ++
+   "\"value\":\"" ++ x ++ "\"," ++
+   "\"raw\":\"'" ++ x ++ "'\"}"
 
 genESExpr (UnaryOp op e) =
   "{\"type\":\"UnaryExpression\"," ++
@@ -108,5 +108,5 @@ genESExpr (If e1 e2 e3) =
 genESExpr (Tuple es) = genESExpr (List es)
 
 genESExpr (List es) =
- "{\"type\":\"ArrayExpression\"," ++
-  "\"elements\":[" ++ (intercalate "," $ genESExpr <$> es) ++ "]}"
+  "{\"type\":\"ArrayExpression\"," ++
+   "\"elements\":[" ++ (intercalate "," $ genESExpr <$> es) ++ "]}"
