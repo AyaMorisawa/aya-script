@@ -75,7 +75,7 @@ multiParamFunE = flip (foldr Fun) <$> (lexeme (char '\\') *> many1 identifier) <
 
 funE :: Parser Expr
 funE = Fun <$> (lexeme (char '\\') *> identifier)
-          <*> (lexeme (string "->") *> expr)
+           <*> (lexeme (string "->") *> expr)
 
 listE :: Parser Expr
 listE = List <$> (lexeme (char '[') *> exprs <* lexeme (char ']'))
