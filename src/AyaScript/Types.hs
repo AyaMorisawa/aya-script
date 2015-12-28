@@ -1,4 +1,11 @@
-module AyaScript.Expr where
+module AyaScript.Types where
+
+type Program = [Stmt]
+
+data Stmt = Expr Expr
+          | Decl Expr Expr
+          | Assign Expr Expr
+  deriving (Show, Eq)
 
 data Expr = Natural Integer
           | Str String

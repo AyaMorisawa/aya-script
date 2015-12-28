@@ -1,9 +1,7 @@
 module AyaScript where
 
 import AyaScript.GenES
-import AyaScript.Program
-import AyaScript.Stmt
-import AyaScript.Expr
+import AyaScript.Types
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language

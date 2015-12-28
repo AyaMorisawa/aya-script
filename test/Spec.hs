@@ -1,8 +1,6 @@
 import Test.Hspec
 import AyaScript
-import AyaScript.Program
-import AyaScript.Stmt
-import AyaScript.Expr
+import AyaScript.Types
 
 main :: IO ()
 main = hspec spec

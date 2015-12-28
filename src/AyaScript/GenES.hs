@@ -1,8 +1,6 @@
 module AyaScript.GenES where
 
-import AyaScript.Program
-import AyaScript.Stmt
-import AyaScript.Expr
+import AyaScript.Types
 import Data.List
 
 genES :: Program -> String
