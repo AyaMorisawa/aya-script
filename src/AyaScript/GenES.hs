@@ -1,112 +1,112 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module AyaScript.GenES where
 
 import AyaScript.Types
 import Data.List
+import Data.Aeson
+import Data.ByteString.Lazy.Char8 (unpack)
+
+s :: String -> String
+s = id
+
+n :: Num a => a -> a
+n = id
+
+me :: Maybe Expr -> Maybe Expr
+me = id
+
+le :: [Expr] -> [Expr]
+le = id
+
+o :: ToJSON a => a -> String
+o = unpack . encode
 
 genES :: Program -> String
-genES stmts =
-  "{\"type\":\"Program\"," ++
-   "\"body\":[" ++ (intercalate "," $ genESStmt <$> stmts) ++ "]," ++
-   "\"sourceType\":\"script\"}"
+genES stmts = o $ object [ "type" .= s "Program"
+                         , "body" .= stmts
+                         , "sourceType" .= s "script"]
 
-genESStmt :: Stmt -> String
-genESStmt (Expr e) =
-  "{\"type\":\"ExpressionStatement\"," ++
-   "\"expression\":" ++ genESExpr e ++ "}"
+instance ToJSON Expr where
+  toJSON (Natural x) = object [ "type" .= s "Literal"
+                              , "value" .= n x
+                              , "raw" .= show x]
 
-genESStmt (Decl e1 e2) =
-  "{\"type\":\"VariableDeclaration\"," ++
-   "\"declarations\":[{" ++
-       "\"type\":\"VariableDeclarator\"," ++
-       "\"id\":" ++ genESExpr e1 ++ "," ++
-       "\"init\":" ++ genESExpr e2 ++ "}" ++
-     "]," ++
-   "\"kind\":\"var\"}"
+  toJSON (Str x) = object [ "type" .= s "Literal"
+                          , "value" .= x
+                          , "raw" .= s ("'" ++ x ++ "'")]
 
-genESStmt (Assign e1 e2) =
-  "{\"type\":\"ExpressionStatement\"," ++
-   "\"expression\":{" ++
-     "\"type\":\"AssignmentExpression\"," ++
-     "\"operator\":\"=\"," ++
-     "\"left\":" ++ genESExpr e1 ++ "," ++
-     "\"right\":" ++ genESExpr e2 ++ "}}"
+  toJSON (UnaryOp op e) = object [ "type" .= s "UnaryExpression"
+                               , "operator" .= op
+                               , "argument" .= e
+                               , "prefix" .= True]
 
-genESExpr :: Expr -> String
-genESExpr (Natural x) =
-  "{\"type\":\"Literal\"," ++
-   "\"value\":" ++ show x ++ "," ++
-   "\"raw\":\"" ++ show x ++ "\"}"
+  toJSON (BinOp "." e1 e2@(Var _)) = object [ "type" .= s "MemberExpression"
+                                            , "computed" .= False
+                                            , "object" .= e1
+                                            , "property" .= e2]
 
-genESExpr (Str x) =
-  "{\"type\":\"Literal\"," ++
-   "\"value\":\"" ++ x ++ "\"," ++
-   "\"raw\":\"'" ++ x ++ "'\"}"
+  toJSON (BinOp "." e1 e2) = object [ "type" .= s "MemberExpression"
+                                    , "computed" .= True
+                                    , "object" .= e1
+                                    , "property" .= e2]
 
-genESExpr (UnaryOp op e) =
-  "{\"type\":\"UnaryExpression\"," ++
-   "\"operator\":\"" ++ op ++ "\"," ++
-   "\"argument\":" ++ genESExpr e ++ "," ++
-   "\"prefix\":true}"
+  toJSON (BinOp "**" e1 e2) = toJSON $ BinOp "" (BinOp "." (Var "Math") (Var "pow")) (Tuple [e1, e2])
 
-genESExpr (BinOp "." e1 e2@(Var _)) =
-  "{\"type\":\"MemberExpression\"," ++
-   "\"computed\":false," ++
-   "\"object\":" ++ genESExpr e1 ++ "," ++
-   "\"property\":" ++ genESExpr e2 ++ "}"
+  toJSON (BinOp "|>" x f) = toJSON $ BinOp "" f x
 
-genESExpr (BinOp "." e1 e2) =
-  "{\"type\":\"MemberExpression\"," ++
-   "\"computed\":true," ++
-   "\"object\":" ++ genESExpr e1 ++ "," ++
-   "\"property\":" ++ genESExpr e2 ++ "}"
+  toJSON (BinOp "<$>" f xs) = toJSON $ BinOp "" (BinOp "." xs (Var "map")) f
 
-genESExpr (BinOp "**" e1 e2) = genESExpr (BinOp "" (BinOp "." (Var "Math") (Var "pow")) (Tuple [e1, e2]))
+  toJSON (BinOp "==" e1 e2) = toJSON $ BinOp "===" e1 e2
 
-genESExpr (BinOp "|>" x f) = genESExpr (BinOp "" f x)
+  toJSON (BinOp "/=" e1 e2) = toJSON $ BinOp "!==" e1 e2
 
-genESExpr (BinOp "<$>" f xs) = genESExpr (BinOp "" (BinOp "." xs (Var "map")) f)
+  toJSON (BinOp "" e1 (Tuple es)) = object [ "type" .= s "CallExpression"
+                                           , "callee" .= e1
+                                           , "arguments" .= es]
 
-genESExpr (BinOp "==" e1 e2) = genESExpr (BinOp "===" e1 e2)
+  toJSON (BinOp "" e1 e2) = object [ "type" .= s "CallExpression"
+                                   , "callee" .= e1
+                                   , "arguments" .= [e2]]
 
-genESExpr (BinOp "/=" e1 e2) = genESExpr (BinOp "!==" e1 e2)
+  toJSON (BinOp op e1 e2) = object [ "type" .= s "BinaryExpression"
+                                   , "operator" .= op
+                                   , "left" .= e1
+                                   , "right" .= e2]
 
-genESExpr (BinOp "" e1 (Tuple es)) =
-  "{\"type\":\"CallExpression\"," ++
-   "\"callee\":" ++ genESExpr e1 ++ "," ++
-   "\"arguments\":[" ++ (intercalate "," $ genESExpr <$> es) ++ "]}"
+  toJSON (Var var) = object [ "type" .= s "Identifier"
+                            , "name" .= var]
 
-genESExpr (BinOp "" e1 e2) =
-  "{\"type\":\"CallExpression\"," ++
-   "\"callee\":" ++ genESExpr e1 ++ "," ++
-   "\"arguments\":[" ++ genESExpr e2 ++ "]}"
+  toJSON (Fun param e) = object [ "type" .= s "ArrowFunctionExpression"
+                                , "id" .= me Nothing
+                                , "params" .= [Var param]
+                                , "defaults" .= le []
+                                , "body" .= e
+                                , "generator" .= False
+                                , "expression" .= True]
 
-genESExpr (BinOp op e1 e2) =
-  "{\"type\":\"BinaryExpression\"," ++
-   "\"operator\":\"" ++ op ++ "\"," ++
-   "\"left\":" ++ genESExpr e1 ++ "," ++
-   "\"right\":" ++ genESExpr e2 ++ "}"
+  toJSON (If e1 e2 e3) = object [ "type" .= s "ConditionalExpression"
+                                , "test" .= e1
+                                , "consequent" .= e2
+                                , "alternate" .= e3]
 
-genESExpr (Var var) =
-  "{\"type\":\"Identifier\"," ++
-   "\"name\":\"" ++ var ++ "\"}"
+  toJSON (Tuple es) = toJSON $ List es
 
-genESExpr (Fun param e) =
-  "{\"type\":\"ArrowFunctionExpression\"," ++
-   "\"id\":null," ++
-   "\"params\":[" ++ genESExpr (Var param) ++ "]," ++
-   "\"defaults\":[]," ++
-   "\"body\":" ++ genESExpr e ++ "," ++
-   "\"generator\":false," ++
-   "\"expression\":true}"
+  toJSON (List es) = object [ "type" .= s "ArrayExpression"
+                            , "elements" .= es]
 
-genESExpr (If e1 e2 e3) =
-  "{\"type\":\"ConditionalExpression\"," ++
-   "\"test\":" ++ genESExpr e1 ++ "," ++
-   "\"consequent\":" ++ genESExpr e2 ++ "," ++
-   "\"alternate\":" ++ genESExpr e3 ++ "}"
+instance ToJSON Stmt where
+  toJSON (Expr e) = object [ "type" .= s "ExpressionStatement"
+                           , "expression" .= e]
 
-genESExpr (Tuple es) = genESExpr (List es)
+  toJSON (Decl e1 e2) = object [ "type" .= s "VariableDeclaration"
+                               , "declarations" .= [object [ "type" .= s "VariableDeclarator"
+                                                          , "id" .= e1
+                                                          , "init" .= e2]]
+                               , "kind" .= s "var"]
 
-genESExpr (List es) =
-  "{\"type\":\"ArrayExpression\"," ++
-   "\"elements\":[" ++ (intercalate "," $ genESExpr <$> es) ++ "]}"
+  toJSON (Assign e1 e2) = object [ "type" .= s "ExpressionStatement"
+                                 , "expression" .= object [ "type" .= s "AssignmentExpression"
+                                                          , "operator" .= s "="
+                                                          , "left" .= e1
+                                                          , "right" .= e2]]
