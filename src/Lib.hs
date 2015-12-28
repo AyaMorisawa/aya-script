@@ -90,7 +90,9 @@ term = try mapOp
    <|> factor
 
 mapOp :: Parser Expr
-mapOp = foldl1 (\f xs -> App (BinOp "." xs (Var "map")) f) <$> ((:) <$> factor <*> many1 (lexeme (string "<$>") *> factor))
+mapOp = foldl1 mapApp <$> ((:) <$> factor <*> many1 (lexeme (string "<$>") *> factor))
+  where
+    mapApp f xs = App (BinOp "." xs (Var "map")) f
 
 pipeApp :: Parser Expr
 pipeApp = foldl1 (flip App) <$> ((:) <$> factor <*> many1 (lexeme (string "|>") *> factor))
