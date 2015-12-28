@@ -104,3 +104,7 @@ spec = do
       test "a = 3" [Decl (Var "a") (Natural 3)] (
           "var a = 3", "{\"type\":\"Program\",\"body\":[{\"type\":\"VariableDeclaration\",\"declarations\":[{\"type\":\"VariableDeclarator\",\"id\":{\"type\":\"Identifier\",\"name\":\"a\"},\"init\":{\"type\":\"Literal\",\"value\":3,\"raw\":\"3\"}}],\"kind\":\"var\"}],\"sourceType\":\"script\"}"
         )
+    describe "assignment" $ do
+      test "a #= 3" [Assign (Var "a") (Natural 3)] (
+          "a = 3", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"AssignmentExpression\",\"operator\":\"=\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Literal\",\"value\":3,\"raw\":\"3\"}}}],\"sourceType\":\"script\"}"
+        )

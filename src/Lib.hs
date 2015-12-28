@@ -28,6 +28,7 @@ lexeme      = P.lexeme lexer
 
 data Stmt = Expr Expr
           | Decl Expr Expr
+          | Assign Expr Expr
   deriving (Show, Eq)
 
 data Expr = Natural Integer
@@ -57,6 +58,7 @@ stmts = sepBy stmt (char '\n')
 
 stmt :: Parser Stmt
 stmt = try (Decl <$> expr <*> (lexeme (char '=') *> expr))
+   <|> try (Assign <$> expr <*> (lexeme (string "#=") *> expr))
    <|> Expr <$> expr
 
 expr :: Parser Expr
@@ -143,6 +145,14 @@ genESStmt (Decl e1 e2) =
        "\"init\":" ++ genESExpr e2 ++ "}" ++
      "]," ++
    "\"kind\":\"var\"}"
+
+genESStmt (Assign e1 e2) =
+  "{\"type\":\"ExpressionStatement\"," ++
+   "\"expression\":{" ++
+     "\"type\":\"AssignmentExpression\"," ++
+     "\"operator\":\"=\"," ++
+     "\"left\":" ++ genESExpr e1 ++ "," ++
+     "\"right\":" ++ genESExpr e2 ++ "}}"
 
 genESExpr :: Expr -> String
 genESExpr (Natural x) =
