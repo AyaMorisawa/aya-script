@@ -53,6 +53,7 @@ memberOp  = binOp AssocLeft  ["."] value
 value :: Parser Expr
 value = try ifE
     <|> try negateOp
+    <|> try multiParamFunE
     <|> funE
     <|> listE
     <|> try (parens expr)
@@ -68,6 +69,9 @@ ifE :: Parser Expr
 ifE = If <$> (lexeme (string "if") *> expr)
          <*> (lexeme (string "then") *> expr)
          <*> (lexeme (string "else") *> expr)
+
+multiParamFunE :: Parser Expr
+multiParamFunE = flip (foldr Fun) <$> (lexeme (char '\\') *> many1 identifier) <*> (lexeme (string "->") *> expr)
 
 funE :: Parser Expr
 funE = Fun <$> (lexeme (char '\\') *> identifier)

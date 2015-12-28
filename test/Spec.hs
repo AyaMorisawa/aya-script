@@ -131,6 +131,9 @@ spec = do
       test "\\x -> x" [Expr (Fun "x" (Var "x"))] (
           "x => x", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrowFunctionExpression\",\"id\":null,\"params\":[{\"type\":\"Identifier\",\"name\":\"x\"}],\"defaults\":[],\"body\":{\"type\":\"Identifier\",\"name\":\"x\"},\"generator\":false,\"expression\":true}}],\"sourceType\":\"script\"}"
         )
+      test "\\x y -> x" [Expr (Fun "x" (Fun "y" (Var "x")))] (
+          "x => y => x", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ArrowFunctionExpression\",\"id\":null,\"params\":[{\"type\":\"Identifier\",\"name\":\"x\"}],\"defaults\":[],\"body\":{\"type\":\"ArrowFunctionExpression\",\"id\":null,\"params\":[{\"type\":\"Identifier\",\"name\":\"y\"}],\"defaults\":[],\"body\":{\"type\":\"Identifier\",\"name\":\"x\"},\"generator\":false,\"expression\":true},\"generator\":false,\"expression\":true}}],\"sourceType\":\"script\"}"
+        )
     describe "if-then-else" $ do
       test "if a then b else c" [Expr (If (Var "a") (Var "b") (Var "c"))] (
           "a ? b : c", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"ConditionalExpression\",\"test\":{\"type\":\"Identifier\",\"name\":\"a\"},\"consequent\":{\"type\":\"Identifier\",\"name\":\"b\"},\"alternate\":{\"type\":\"Identifier\",\"name\":\"c\"}}}],\"sourceType\":\"script\"}"
