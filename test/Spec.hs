@@ -35,6 +35,9 @@ spec = do
       test "a ** b" [Expr (BinOp "**" (Var "a") (Var "b"))] (
           "Math.pow(a, b)", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"Math\"},\"property\":{\"type\":\"Identifier\",\"name\":\"pow\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"Identifier\",\"name\":\"b\"}]}}],\"sourceType\":\"script\"}"
         )
+      test "a ** b ** c" [Expr (BinOp "**" (Var "a") (BinOp "**" (Var "b") (Var "c")))] (
+          "Math.pow(a, Math.pow(b, c))", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"Math\"},\"property\":{\"type\":\"Identifier\",\"name\":\"pow\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"a\"},{\"type\":\"CallExpression\",\"callee\":{\"type\":\"MemberExpression\",\"computed\":false,\"object\":{\"type\":\"Identifier\",\"name\":\"Math\"},\"property\":{\"type\":\"Identifier\",\"name\":\"pow\"}},\"arguments\":[{\"type\":\"Identifier\",\"name\":\"b\"},{\"type\":\"Identifier\",\"name\":\"c\"}]}]}}],\"sourceType\":\"script\"}"
+        )
       test "a && b" [Expr (BinOp "&&" (Var "a") (Var "b"))] (
           "a && b", "{\"type\":\"Program\",\"body\":[{\"type\":\"ExpressionStatement\",\"expression\":{\"type\":\"BinaryExpression\",\"operator\":\"&&\",\"left\":{\"type\":\"Identifier\",\"name\":\"a\"},\"right\":{\"type\":\"Identifier\",\"name\":\"b\"}}}],\"sourceType\":\"script\"}"
         )
