@@ -1,5 +1,5 @@
 import Test.Hspec
-import Lib
+import AyaScript
 
 main :: IO ()
 main = hspec spec

@@ -1,7 +1,7 @@
 module Main where
 
 import System.Environment
-import Lib (compile)
+import AyaScript (compile)
 
 main :: IO ()
 main = do
