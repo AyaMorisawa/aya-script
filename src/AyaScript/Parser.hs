@@ -30,7 +30,7 @@ stmts = sepBy stmt (char '\n')
 stmt :: Parser Stmt
 stmt = try declS
    <|> try assignS
-   <|> Expr <$> expr
+   <|> exprS
 
 declS :: Parser Stmt
 declS = Decl <$> expr
@@ -39,6 +39,9 @@ declS = Decl <$> expr
 assignS :: Parser Stmt
 assignS = Assign <$> expr
                  <*> (lexeme (string "#=") *> expr)
+
+exprS :: Parser Stmt
+exprS = Expr <$> expr
 
 expr :: Parser Expr
 expr = pipeOp
