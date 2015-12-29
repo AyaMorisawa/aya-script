@@ -28,9 +28,13 @@ stmts :: Parser [Stmt]
 stmts = sepBy stmt (char '\n')
 
 stmt :: Parser Stmt
-stmt = try (Decl <$> expr <*> (lexeme (char '=') *> expr))
+stmt = try declS
    <|> try (Assign <$> expr <*> (lexeme (string "#=") *> expr))
    <|> Expr <$> expr
+
+declS :: Parser Stmt
+declS = Decl <$> expr
+             <*> (lexeme (char '=') *> expr)
 
 expr :: Parser Expr
 expr = pipeOp
