@@ -71,7 +71,8 @@ ifE = If <$> (lexeme (string "if") *> expr)
          <*> (lexeme (string "else") *> expr)
 
 multiParamFunE :: Parser Expr
-multiParamFunE = flip (foldr Fun) <$> (lexeme (char '\\') *> many1 identifier) <*> (lexeme (string "->") *> expr)
+multiParamFunE = flip (foldr Fun) <$> (lexeme (char '\\') *> many1 identifier)
+                                  <*> (lexeme (string "->") *> expr)
 
 funE :: Parser Expr
 funE = Fun <$> (lexeme (char '\\') *> identifier)
@@ -110,4 +111,5 @@ binOp AssocRight ops prev = do
   return $ foldr (\(e2, op) acc -> flip (BinOp op) acc e2) e1 es
 
 unaryOp :: [String] -> Parser Expr -> Parser Expr
-unaryOp ops prev = UnaryOp <$> foldl1 (<|>) (try . string <$> ops) <*> try prev
+unaryOp ops prev = UnaryOp <$> foldl1 (<|>) (try . string <$> ops)
+                           <*> try prev
