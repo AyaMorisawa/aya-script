@@ -13,7 +13,6 @@ data Expr = Natural Integer
           | BinOp String Expr Expr
           | Var String
           | Fun String Expr
-          | App Expr Expr
           | If Expr Expr Expr
           | Tuple [Expr]
           | List [Expr]
