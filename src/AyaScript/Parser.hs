@@ -29,12 +29,16 @@ stmts = sepBy stmt (char '\n')
 
 stmt :: Parser Stmt
 stmt = try declS
-   <|> try (Assign <$> expr <*> (lexeme (string "#=") *> expr))
+   <|> try assignS
    <|> Expr <$> expr
 
 declS :: Parser Stmt
 declS = Decl <$> expr
              <*> (lexeme (char '=') *> expr)
+
+assignS :: Parser Stmt
+assignS = Assign <$> expr
+                 <*> (lexeme (string "#=") *> expr)
 
 expr :: Parser Expr
 expr = pipeOp
