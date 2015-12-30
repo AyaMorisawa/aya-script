@@ -110,14 +110,14 @@ binOp AssocLeft ops prev = do
   es <- many $ try $ do
     op <- lexeme $ foldl1 (<|>) (try . string <$> ops)
     e2 <- prev
-    return $ (op, e2)
+    return (op, e2)
   return $ foldl (\acc (op, e2) -> BinOp op acc e2) e1 es
 
 binOp AssocRight ops prev = do
   es <- many $ try $ do
     e2 <- prev
     op <- lexeme $ foldl1 (<|>) (try . string <$> ops)
-    return $ (e2, op)
+    return (e2, op)
   e1 <- prev
   return $ foldr (\(e2, op) acc -> flip (BinOp op) acc e2) e1 es
 
