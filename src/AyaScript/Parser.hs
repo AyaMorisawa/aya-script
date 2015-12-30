@@ -8,7 +8,7 @@ import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as P
 
 lexer :: P.TokenParser ()
-lexer = P.makeTokenParser (haskellDef{ reservedOpNames = [] })
+lexer = P.makeTokenParser (haskellDef { reservedOpNames = [] })
 
 natural     = P.natural lexer
 parens      = P.parens lexer
