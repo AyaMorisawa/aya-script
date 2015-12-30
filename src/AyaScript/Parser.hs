@@ -119,7 +119,7 @@ binOp AssocRight ops prev = do
     op <- lexeme $ foldl1 (<|>) (try . string <$> ops)
     return (e2, op)
   e1 <- prev
-  return $ foldr (\(e2, op) acc -> flip (BinOp op) acc e2) e1 es
+  return $ foldr (\(e2, op) acc -> BinOp op e2 acc) e1 es
 
 unaryOp :: [String] -> Parser Expr -> Parser Expr
 unaryOp ops prev = UnaryOp <$> foldl1 (<|>) (try . string <$> ops)
